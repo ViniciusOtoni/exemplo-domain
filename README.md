@@ -71,3 +71,17 @@ task 11, para o porquê). `features/databricks.yml` já aponta
 - `monitoring/`: os dois jobs de drift (`feature_table` e `predictions`) rodaram de
   ponta a ponta, com métricas reais gravadas em `workspace.platform_monitoring.drift_metrics`
   (`status=PASS` em ambos nesta rodada).
+- **CI (`.github/workflows/deploy.yml`)**: confirmado ao vivo, os 5 bundles fazendo
+  deploy com sucesso via GitHub Actions após um push real em `main` (run
+  [32804848226](https://github.com/ViniciusOtoni/exemplo-domain/actions/runs/32804848226)).
+
+## Gap conhecido: endpoint online e custo do CI
+
+O job `serving/online` do CI faz deploy real do `model_serving_endpoint` a cada push
+em `main`, mas **não o derruba automaticamente** — o reusable workflow do
+`mlops-platform` só sabe fazer deploy, não tem um step de teardown. Isso significa
+custo contínuo real na Free Edition depois de qualquer merge, até alguém rodar
+`databricks serving-endpoints delete <nome>` manualmente. Decisão consciente por
+enquanto (2026-08-25): não resolvido ainda — ou adicionar um step de teardown no job
+`serving/online`, ou trocar seu trigger de `push` para `workflow_dispatch` (deploy
+manual, só quando alguém for testar de verdade).
