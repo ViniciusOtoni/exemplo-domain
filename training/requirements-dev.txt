@@ -1,0 +1,8 @@
+training-platform @ git+https://github.com/ViniciusOtoni/training-platform@v0.2.0
+scikit-learn>=1.4
+mlflow>=3.15.0
+pytest>=8.0
+pyspark>=3.5
+delta-spark>=3.2
+databricks-sdk>=0.30
+databricks-feature-engineering>=0.7
