@@ -1,0 +1,15 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        component: [features, training, serving/batch, serving/online, monitoring]
+    uses: ViniciusOtoni/mlops-platform/.github/workflows/deploy-bundle.yml@main
+    with:
+      working-directory: ${{ matrix.component }}
+    secrets: inherit

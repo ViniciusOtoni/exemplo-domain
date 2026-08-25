@@ -1,0 +1,15 @@
+domain: exemplo
+owner: vinicius-otoni
+components:
+  features:
+    package: feature-platform
+    version: v0.2.0
+  training:
+    package: training-platform
+    version: v0.1.0
+  serving:
+    package: serving-platform
+    version: v0.1.0
+  monitoring:
+    package: monitoring-platform
+    version: v0.1.0
