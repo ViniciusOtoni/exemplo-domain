@@ -4,6 +4,12 @@ bundle:
 include:
   - resources/*.yml
 
+artifacts:
+  exemplo_monitoring:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
 variables:
   catalog:
     description: Unity Catalog catalog for monitored tables and the audit table.

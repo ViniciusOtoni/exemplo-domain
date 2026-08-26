@@ -1,7 +1,2 @@
-feature-platform @ git+https://github.com/ViniciusOtoni/feature-platform@v0.2.0
-pandas>=2.0
-pyyaml>=6.0
 pytest>=8.0
 pyspark>=3.5
-delta-spark>=3.2
-databricks-sdk>=0.30

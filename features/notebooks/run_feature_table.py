@@ -1,10 +1,7 @@
 # Databricks notebook source
-# MAGIC %pip install "feature-platform @ git+https://github.com/ViniciusOtoni/feature-platform@v0.2.0"
-
-# COMMAND ----------
-dbutils.library.restartPython()
-
-# COMMAND ----------
+# Dependências (exemplo_features + feature-platform) resolvidas pelo Environment
+# nativo do serverless (job.environments, ver databricks.yml/resource_gen) -- sem
+# %pip install nem sys.path hack aqui.
 dbutils.widgets.text("feature_table", "")
 dbutils.widgets.text("mode", "incremental")
 dbutils.widgets.text("start_date", "")
@@ -15,18 +12,7 @@ dbutils.widgets.text("git_branch", "local")
 dbutils.widgets.text("database_instance_name", "")
 
 # COMMAND ----------
-# Num job deployado via DAB, o cwd do notebook é .../files/notebooks — a raiz do
-# bundle (onde mora `examples/`) não está no sys.path por padrão. feature_platform
-# já foi instalado no cluster pelo %pip install acima (requirements-dev.txt só
-# afeta o venv local de CI/dev, nunca o compute do notebook).
-import os
-import sys
-
-_repo_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
-import examples.features  # noqa: F401  (import dispara o registro via decorator)
+import exemplo_features.features  # noqa: F401  (import dispara o registro via decorator)
 from datetime import date
 
 from feature_platform.contract import get_registry

@@ -5,3 +5,6 @@ __pycache__/
 .databricks/
 .worktrees/
 **/resources/generated_*.yml
+build/
+dist/
+*.egg-info/

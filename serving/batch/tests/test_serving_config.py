@@ -11,7 +11,7 @@ def _reset_registry():
 
 
 def test_propensao_exemplo_batch_config_is_registered():
-    import examples.serving_configs  # noqa: F401  (dispara o registro)
+    import exemplo_serving_batch.serving_configs  # noqa: F401  (dispara o registro)
 
     config = get_serving_config("propensao_exemplo")
 

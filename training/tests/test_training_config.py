@@ -10,7 +10,7 @@ def teardown_function():
 
 
 def test_propensao_exemplo_is_registered_with_feature_lookups():
-    import examples.training_configs  # noqa: F401  (dispara o registro)
+    import exemplo_training.training_configs  # noqa: F401  (dispara o registro)
 
     config = get_training_config("propensao_exemplo")
 

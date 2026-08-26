@@ -1,10 +1,7 @@
 # Databricks notebook source
-# MAGIC %pip install "monitoring-platform @ git+https://github.com/ViniciusOtoni/monitoring-platform@v0.1.0"
-
-# COMMAND ----------
-dbutils.library.restartPython()
-
-# COMMAND ----------
+# Dependências resolvidas pelo Environment nativo do serverless (ver
+# databricks.yml/scripts/generate_resources.py) -- sem %pip install nem
+# sys.path hack aqui.
 dbutils.widgets.text("domain", "")
 dbutils.widgets.text("model_name", "")
 dbutils.widgets.text("target_type", "")
@@ -13,17 +10,7 @@ dbutils.widgets.text("git_commit", "local")
 dbutils.widgets.text("git_branch", "local")
 
 # COMMAND ----------
-# Num job deployado via DAB, o cwd do notebook é .../files/notebooks — a raiz do
-# bundle (onde mora `examples/`) não está no sys.path por padrão. monitoring_platform
-# já foi instalado no cluster pelo %pip install acima.
-import os
-import sys
-
-_repo_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
-import examples.monitoring_configs  # noqa: F401
+import exemplo_monitoring.monitoring_configs  # noqa: F401  (dispara o registro)
 from datetime import date, datetime
 
 from databricks.sdk import WorkspaceClient

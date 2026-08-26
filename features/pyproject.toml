@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exemplo-features"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "feature-platform @ git+https://github.com/ViniciusOtoni/platform-libs@feature-platform-v0.1.2#subdirectory=packages/feature-platform",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

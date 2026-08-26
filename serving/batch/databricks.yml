@@ -4,6 +4,12 @@ bundle:
 include:
   - resources/*.yml
 
+artifacts:
+  exemplo_serving_batch:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
 variables:
   catalog:
     description: Unity Catalog catalog for models, predictions, and the audit table.

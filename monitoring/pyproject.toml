@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exemplo-monitoring"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "monitoring-platform @ git+https://github.com/ViniciusOtoni/platform-libs@monitoring-platform-v0.1.1#subdirectory=packages/monitoring-platform",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

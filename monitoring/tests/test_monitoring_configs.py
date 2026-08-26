@@ -11,7 +11,7 @@ def _reset_registry():
 
 
 def test_feature_and_predictions_drift_configs_are_registered():
-    import examples.monitoring_configs  # noqa: F401  (dispara o registro)
+    import exemplo_monitoring.monitoring_configs  # noqa: F401  (dispara o registro)
 
     feature_drift = get_monitoring_config("exemplo", "propensao_exemplo", "feature_table")
     predictions_drift = get_monitoring_config("exemplo", "propensao_exemplo", "predictions")

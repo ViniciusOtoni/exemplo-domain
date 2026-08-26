@@ -11,7 +11,7 @@ def _reset_registry():
 
 
 def test_customer_transaction_features_is_registered_online():
-    import examples.features  # noqa: F401  (dispara o registro via decorator)
+    import exemplo_features.features  # noqa: F401  (dispara o registro via decorator)
 
     registry = get_registry()
     spec = registry["customer_transaction_features"]
