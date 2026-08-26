@@ -1,15 +1,18 @@
 domain: exemplo
 owner: vinicius-otoni
+
+# O framework é um pacote só. Antes havia uma versão por componente, porque eram
+# quatro pacotes distintos em quatro repositórios.
+#
+# A versão é pinada de forma EXATA, nunca um range: com um pacote único, é isso
+# que preserva a capacidade de cada bundle subir em momento diferente. Bundles
+# ainda não migrados seguem nas tags antigas por componente até sua vez.
+framework:
+  package: mlplatform
+  version: v3.1.0
+
 components:
-  features:
-    package: feature-platform
-    version: v0.1.2
-  training:
-    package: training-platform
-    version: v0.1.0
-  serving:
-    package: serving-platform
-    version: v0.1.1
-  monitoring:
-    package: monitoring-platform
-    version: v0.1.1
+  features: migrated
+  training: pending
+  serving: pending
+  monitoring: pending

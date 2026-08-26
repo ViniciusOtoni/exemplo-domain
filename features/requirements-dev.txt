@@ -1,2 +1,0 @@
-pytest>=8.0
-pyspark>=3.5
