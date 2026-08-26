@@ -1,0 +1,10 @@
+# Único arquivo de configuração escrito à mão neste bundle.
+#
+# Tudo o mais é derivado pelo framework: o nome do bundle vem de domínio +
+# componente, o domínio vem das próprias @feature_table registradas, e a versão
+# do framework vem do pacote instalado. O databricks.yml e o resources/ são
+# materializados pela esteira e não são versionados.
+component: features
+domain_package: exemplo_features
+catalog: workspace
+database_instance_name: exemplo-lakebase

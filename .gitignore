@@ -8,3 +8,9 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+
+# Materializados pela esteira a partir de conf/variables.yml — não versionados,
+# o que também elimina o risco de alguém editar um arquivo gerado e ter a edição
+# sobrescrita em silêncio no próximo deploy.
+features/databricks.yml
+features/resources/

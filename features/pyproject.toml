@@ -4,10 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exemplo-features"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.11"
 dependencies = [
-    "feature-platform @ git+https://github.com/ViniciusOtoni/platform-libs@feature-platform-v0.1.2#subdirectory=packages/feature-platform",
+    "mlplatform @ git+https://github.com/ViniciusOtoni/platform-libs@mlplatform-v3.1.0",
+]
+
+# Como o framework descobre este domínio: importar o módulo é o que dispara os
+# decorators @feature_table. Antes era um import escrito à mão dentro do
+# notebook; com python_wheel_task não há notebook onde escrevê-lo.
+[project.entry-points."mlplatform.domains"]
+exemplo_features = "exemplo_features.configs"
+
+# Dependências de teste do domínio. Ficam aqui, e não num requirements-dev.txt
+# solto, para que o pacote declare tudo o que precisa num arquivo só.
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pyspark>=3.5",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,6 +1,6 @@
 import pyspark.sql.functions as F
 
-from feature_platform.contract import feature_table
+from mlplatform.features.contract import feature_table
 
 
 @feature_table(
