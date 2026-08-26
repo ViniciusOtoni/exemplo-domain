@@ -16,7 +16,7 @@ resources:
           spec:
             client: "3"
             dependencies:
-              - ./dist/*.whl
+              - ../dist/*.whl
               - https://github.com/ViniciusOtoni/platform-libs/releases/download/training-platform-v0.1.0/training_platform-0.1.0-py3-none-any.whl
               - databricks-feature-engineering>=0.7
       tasks:

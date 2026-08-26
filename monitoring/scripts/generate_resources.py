@@ -13,6 +13,6 @@ if __name__ == "__main__":
     output_path.parent.mkdir(exist_ok=True)
     write_resources(
         str(output_path),
-        environment_dependencies=["./dist/*.whl", MONITORING_PLATFORM_WHEEL_URL],
+        environment_dependencies=["../dist/*.whl", MONITORING_PLATFORM_WHEEL_URL],
     )
     print(f"resources written to {output_path}")
