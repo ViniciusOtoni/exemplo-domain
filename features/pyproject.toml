@@ -6,8 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "exemplo-features"
 version = "0.2.0"
 requires-python = ">=3.11"
+# Pinado pela URL do WHEEL do Release, e não por git+https.
+#
+# O wheel do domínio é instalado dentro do serverless, e o pip precisa satisfazer
+# esta linha lá dentro. Um `git+https` exige git e um clone do repositório, o que
+# falha no serverless com "Unable to find or download the required package".
+# A URL do Release é um único GET HTTPS — verificado ao vivo que funciona.
 dependencies = [
-    "mlplatform @ git+https://github.com/ViniciusOtoni/platform-libs@mlplatform-v3.1.0",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.2.0/mlplatform-3.2.0-py3-none-any.whl",
 ]
 
 # Como o framework descobre este domínio: importar o módulo é o que dispara os
