@@ -9,7 +9,7 @@ owner: vinicius-otoni
 # ainda não migrados seguem nas tags antigas por componente até sua vez.
 framework:
   package: mlplatform
-  version: v3.2.0
+  version: v3.3.1
 
 components:
   features: migrated
