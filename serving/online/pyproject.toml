@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exemplo-serving-online"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "serving-platform @ git+https://github.com/ViniciusOtoni/platform-libs@serving-platform-v0.1.1#subdirectory=packages/serving-platform",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

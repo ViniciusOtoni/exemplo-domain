@@ -1,27 +1,14 @@
 # Databricks notebook source
-# MAGIC %pip install databricks-feature-engineering "mlflow>=3.15.0" "serving-platform @ git+https://github.com/ViniciusOtoni/serving-platform@v0.1.0"
-
-# COMMAND ----------
-dbutils.library.restartPython()
-
-# COMMAND ----------
+# Dependências resolvidas pelo Environment nativo do serverless (ver
+# databricks.yml/scripts/generate_resources.py) -- sem %pip install nem
+# sys.path hack aqui.
 dbutils.widgets.text("model_name", "")
 dbutils.widgets.text("catalog", "workspace")
 dbutils.widgets.text("git_commit", "local")
 dbutils.widgets.text("git_branch", "local")
 
 # COMMAND ----------
-# Num job deployado via DAB, o cwd do notebook é .../files/notebooks — a raiz do
-# bundle (onde mora `examples/`) não está no sys.path por padrão. serving_platform
-# já foi instalado no cluster pelo %pip install acima.
-import os
-import sys
-
-_repo_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
-import examples.serving_configs  # noqa: F401
+import exemplo_serving_batch.serving_configs  # noqa: F401  (dispara o registro)
 from datetime import date, datetime
 
 import pyspark.sql.functions as F

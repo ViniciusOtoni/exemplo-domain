@@ -1,26 +1,13 @@
 # Databricks notebook source
-# MAGIC %pip install databricks-feature-engineering "training-platform @ git+https://github.com/ViniciusOtoni/training-platform@v0.2.0"
-
-# COMMAND ----------
-dbutils.library.restartPython()
-
-# COMMAND ----------
+# Dependências (exemplo_training + training-platform + databricks-feature-engineering)
+# resolvidas pelo Environment nativo do serverless (job.environments, ver
+# databricks.yml/resources/training_pipeline.job.yml) -- sem %pip install nem
+# sys.path hack aqui.
 dbutils.widgets.text("model_name", "")
 dbutils.widgets.text("catalog", "workspace")
 
 # COMMAND ----------
-# Num job deployado via DAB, o cwd do notebook é .../files/notebooks — a raiz do
-# bundle (onde mora `examples/`) não está no sys.path por padrão. training_platform
-# já foi instalado no cluster pelo %pip install acima (requirements-dev.txt só
-# afeta o venv local de CI/dev, nunca o compute do notebook).
-import os
-import sys
-
-_repo_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
-import examples.training_configs  # noqa: F401
+import exemplo_training.training_configs  # noqa: F401  (dispara o registro)
 import pyspark.sql.functions as F
 import mlflow
 
