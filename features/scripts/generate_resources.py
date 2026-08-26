@@ -14,7 +14,7 @@ if __name__ == "__main__":
     write_job_resource(
         str(output_path),
         environment_dependencies=[
-            "./dist/*.whl",
+            "../dist/*.whl",
             FEATURE_PLATFORM_WHEEL_URL,
         ],
     )

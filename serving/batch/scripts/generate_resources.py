@@ -24,7 +24,7 @@ if __name__ == "__main__":
         str(output_path),
         resolve_alias_version=_resolve_alias_version,
         environment_dependencies=[
-            "./dist/*.whl",
+            "../dist/*.whl",
             SERVING_PLATFORM_WHEEL_URL,
             "databricks-feature-engineering>=0.7",
             "mlflow>=3.15.0",

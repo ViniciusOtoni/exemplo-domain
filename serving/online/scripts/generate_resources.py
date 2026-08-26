@@ -23,6 +23,6 @@ if __name__ == "__main__":
     write_resources(
         str(output_path),
         resolve_alias_version=_resolve_alias_version,
-        environment_dependencies=["./dist/*.whl", SERVING_PLATFORM_WHEEL_URL],
+        environment_dependencies=["../dist/*.whl", SERVING_PLATFORM_WHEEL_URL],
     )
     print(f"resources written to {output_path}")
