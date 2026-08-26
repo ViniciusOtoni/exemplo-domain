@@ -16,5 +16,13 @@ dependencies = [
 [project.entry-points."mlplatform.domains"]
 exemplo_features = "exemplo_features.configs"
 
+# Dependências de teste do domínio. Ficam aqui, e não num requirements-dev.txt
+# solto, para que o pacote declare tudo o que precisa num arquivo só.
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pyspark>=3.5",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
