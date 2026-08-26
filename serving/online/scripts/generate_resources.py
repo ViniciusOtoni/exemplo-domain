@@ -1,7 +1,8 @@
 from pathlib import Path
 
-import exemplo_serving_online.serving_configs  # noqa: F401  (importa o domínio para popular o registro)
 from databricks.sdk import WorkspaceClient
+
+import exemplo_serving_online.serving_configs  # noqa: F401  (importa o domínio para popular o registro)
 from serving_platform.resource_gen import write_resources
 
 CATALOG = "workspace"  # deve bater com o default de `catalog` em databricks.yml
