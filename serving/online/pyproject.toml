@@ -4,11 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exemplo-serving-online"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.11"
+# Pinado pela URL do WHEEL do Release, não por git+https: o wheel do domínio é
+# instalado dentro do serverless, e satisfazer um git+ lá exigiria git e um clone.
 dependencies = [
-    "serving-platform @ git+https://github.com/ViniciusOtoni/platform-libs@serving-platform-v0.1.1#subdirectory=packages/serving-platform",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.4.3/mlplatform-3.4.3-py3-none-any.whl",
 ]
+
+[project.entry-points."mlplatform.domains"]
+exemplo_serving_online = "exemplo_serving_online.configs"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

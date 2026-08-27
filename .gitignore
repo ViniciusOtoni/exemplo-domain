@@ -14,3 +14,7 @@ dist/
 # sobrescrita em silêncio no próximo deploy.
 features/databricks.yml
 features/resources/
+serving/batch/databricks.yml
+serving/batch/resources/
+serving/online/databricks.yml
+serving/online/resources/

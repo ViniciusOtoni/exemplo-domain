@@ -1,2 +1,0 @@
-pytest>=8.0
-databricks-sdk>=0.30
