@@ -4,11 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exemplo-training"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.11"
+# Pinado pela URL do WHEEL do Release, não por git+https: o wheel do domínio é
+# instalado dentro do serverless, e satisfazer um git+ lá exigiria git e um clone.
 dependencies = [
-    "training-platform @ git+https://github.com/ViniciusOtoni/platform-libs@training-platform-v0.1.0#subdirectory=packages/training-platform",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.5.1/mlplatform-3.5.1-py3-none-any.whl",
 ]
+
+[project.entry-points."mlplatform.domains"]
+exemplo_training = "exemplo_training.configs"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

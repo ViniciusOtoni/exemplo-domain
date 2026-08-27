@@ -18,3 +18,5 @@ serving/batch/databricks.yml
 serving/batch/resources/
 serving/online/databricks.yml
 serving/online/resources/
+training/databricks.yml
+training/resources/
