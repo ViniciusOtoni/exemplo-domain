@@ -3,6 +3,11 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # Redeploy sem commit. Faz falta quando o deploy falha por algo externo ao
+  # repositório — o caso concreto foi o endpoint de serving recusar uma versão
+  # de modelo com requisitos irresolvíveis: corrigido o modelo, o bundle precisa
+  # subir de novo, e sem isto a única saída era um commit vazio.
+  workflow_dispatch:
 
 jobs:
   deploy:
