@@ -4,11 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exemplo-monitoring"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.11"
+# Pinado pela URL do WHEEL do Release, não por git+https: o wheel do domínio é
+# instalado dentro do serverless, e satisfazer um git+ lá exigiria git e um clone.
 dependencies = [
-    "monitoring-platform @ git+https://github.com/ViniciusOtoni/platform-libs@monitoring-platform-v0.1.1#subdirectory=packages/monitoring-platform",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.8.0/mlplatform-3.8.0-py3-none-any.whl",
 ]
+
+[project.entry-points."mlplatform.domains"]
+exemplo_monitoring = "exemplo_monitoring.configs"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
