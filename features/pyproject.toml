@@ -13,7 +13,7 @@ requires-python = ">=3.11"
 # falha no serverless com "Unable to find or download the required package".
 # A URL do Release é um único GET HTTPS — verificado ao vivo que funciona.
 dependencies = [
-    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.11.0/mlplatform-3.11.0-py3-none-any.whl",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.11.1/mlplatform-3.11.1-py3-none-any.whl",
 ]
 
 # Como o framework descobre este domínio: importar o módulo é o que dispara os
