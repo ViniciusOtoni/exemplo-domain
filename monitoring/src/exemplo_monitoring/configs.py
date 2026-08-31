@@ -1,5 +1,13 @@
 from mlplatform.monitoring.contract import MonitoringConfig, register_monitoring_config
 
+# Limiar de 0.25 no PSI (population stability index), que é o default do
+# framework e a convenção da indústria: <0.1 estável, 0.1–0.25 moderado,
+# >0.25 significativo. As métricas limitadas a [0,1] — js_distance e afins —
+# não servem aqui: o monitor só as calcula para colunas CATEGÓRICAS, e todas
+# as observadas abaixo são numéricas. Escolher uma delas produziria nulo em
+# toda medição, que é "sem drift" para sempre.
+THRESHOLD = 0.25
+
 # Drift das features: a distribuição das colunas que alimentam o modelo.
 register_monitoring_config(
     MonitoringConfig(
@@ -8,7 +16,7 @@ register_monitoring_config(
         target_type="feature_table",
         target_table="workspace.exemplo_features.customer_transaction_features",
         columns=["txn_count", "avg_ticket"],
-        threshold=0.2,
+        threshold=THRESHOLD,
         schedule_cron="0 0 7 * * ?",
     )
 )
@@ -23,7 +31,7 @@ register_monitoring_config(
         target_type="predictions",
         target_table="workspace.exemplo_predictions.propensao_exemplo",
         columns=["prediction"],
-        threshold=0.2,
+        threshold=THRESHOLD,
         schedule_cron="0 0 8 * * ?",
     )
 )
