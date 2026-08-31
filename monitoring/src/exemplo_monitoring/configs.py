@@ -18,6 +18,10 @@ register_monitoring_config(
         columns=["txn_count", "avg_ticket"],
         threshold=THRESHOLD,
         schedule_cron="0 0 7 * * ?",
+        # Compara contra a janela em que o modelo vigente foi treinado, e não
+        # contra a safra anterior. A pergunta muda: deixa de ser "mudou desde
+        # ontem?" e passa a ser "afastou-se do que o modelo aprendeu?".
+        baseline_timestamp_column="feature_ts",
     )
 )
 
@@ -33,5 +37,8 @@ register_monitoring_config(
         columns=["prediction"],
         threshold=THRESHOLD,
         schedule_cron="0 0 8 * * ?",
+        # Sem baseline aqui, de propósito: não existem predições do período de
+        # treino — o modelo ainda não existia. Comparar com a safra anterior é
+        # o que faz sentido para o score.
     )
 )

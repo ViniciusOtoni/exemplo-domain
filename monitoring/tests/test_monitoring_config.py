@@ -71,3 +71,14 @@ def test_the_threshold_follows_the_psi_convention():
 
     assert features.threshold == 0.25
     assert predictions.threshold == 0.25
+
+
+def test_only_the_feature_table_compares_against_the_training_window():
+    """A tabela de predições não tem baseline possível: não existem predições do
+    período de treino — o modelo ainda não existia. Declarar uma ali faria o
+    monitor comparar contra o vazio."""
+    features = get_monitoring_config("exemplo", "propensao_exemplo", "feature_table")
+    predictions = get_monitoring_config("exemplo", "propensao_exemplo", "predictions")
+
+    assert features.baseline_timestamp_column == "feature_ts"
+    assert predictions.baseline_timestamp_column is None
