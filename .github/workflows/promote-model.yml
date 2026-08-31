@@ -1,0 +1,39 @@
+# Promoção manual de um modelo para um alias.
+#
+# É AQUI que a aprovação acontece. O retreino por drift registra o candidato e
+# abre uma issue com o número da versão; nada vai para produção até alguém rodar
+# este workflow.
+#
+# Disparo manual, e não um job guardado por `environment:` dentro do retreino:
+# "Required reviewers" em Environment é recurso de plano, e neste repositório
+# (privado, conta gratuita) a API recusa a regra — o Environment existe sem
+# proteção nenhuma e um job guardado por ele passaria direto.
+name: Promote Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: Modelo a promover.
+        required: true
+        default: propensao_exemplo
+      version:
+        description: Versão candidata (está na issue aberta pelo retreino).
+        required: true
+      alias:
+        description: Alias a mover.
+        required: true
+        default: champion
+
+jobs:
+  promote:
+    uses: ViniciusOtoni/mlops-platform/.github/workflows/promote-model.yml@main
+    with:
+      working-directory: training
+      domain: exemplo
+      model-name: ${{ inputs.model_name }}
+      version: ${{ inputs.version }}
+      alias: ${{ inputs.alias }}
+      catalog: workspace
+      promotion-environment: model-promotion
+    secrets: inherit
