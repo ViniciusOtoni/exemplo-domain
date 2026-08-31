@@ -28,5 +28,4 @@ jobs:
         ${{ github.event.client_payload.model_name || inputs.model_name }}
       catalog: workspace
       alias: champion
-      promotion-environment: model-promotion
     secrets: inherit
