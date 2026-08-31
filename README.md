@@ -23,30 +23,23 @@ Nos balanços do segundo trimestre, um banco se descolou dos outros.
 
 ![Inadimplência acima de 90 dias por banco, 2T26](docs/img/npl-bancos-2t26.png)
 
-E aqui está a leitura que os números soltos escondem: **NPL estável não é qualidade de crédito estável**. O Bradesco subiu apenas 0,2 p.p. no indicador, e mesmo assim elevou a provisão em 21,4%, para R$ 10,85 bilhões. O estoque de 90 dias é indicador atrasado. A provisão antecipa.
-
-Um modelo de probabilidade de default tenta encurtar essa defasagem mais um passo: estimar quem vai atrasar antes de o atraso existir.
-
-Desde a [Resolução CMN 4.966](https://www.deloitte.com/br/pt/services/audit-assurance/perspectives/resolucao-cmn-4966.html), em vigor desde janeiro de 2025, isso deixou de ser só política de crédito. O banco provisiona por perda esperada, estimada na originação. A PD virou peça contábil.
-
 ## O segundo problema: o modelo existe, mas não chega
 
-O cientista de dados entrega um notebook com AUC de 0,78. Entre esse notebook e uma decisão de crédito em produção há um vão que costuma consumir meses:
+O cientista de dados dá conta da parte difícil. Ele entende a regra de negócio, conversa com a área de crédito, escolhe as variáveis que fazem sentido e treina um modelo que funciona.
+
+O problema começa depois. Sem uma plataforma madura por baixo, esse modelo pode levar meses até servir alguém, e às vezes não chega. Cada etapa vira um projeto próprio:
 
 | etapa | o que normalmente acontece |
 |---|---|
-| feature store | cada domínio escreve a sua, com regras próprias de janela e chave |
-| treino | split aleatório, que vaza o futuro e infla a métrica |
+| feature store | a mesma feature é recalculada em vários lugares, e os valores não batem entre si |
+| treino | cada pessoa treina do seu jeito, sem um padrão de MLOps que valha para todo mundo |
 | registro | modelo salvo sem linhagem, ninguém sabe quais features entraram |
-| serving | batch e online reimplementados separadamente, com lógicas que divergem |
-| monitoramento | notebook agendado que ninguém lê |
-| retreino | manual, quando alguém percebe que o modelo caiu |
+| serving | sem uma feature store madura por trás, batch e online são construídos separados e passam a divergir |
+| monitoramento e retreino | ninguém enxerga o drift de forma tangível, e cada safra nova levanta a dúvida de retreinar sem resposta objetiva |
 
 Nada disso é difícil isoladamente. O custo está em fazer tudo de novo a cada modelo, e em cada reimplementação divergir um pouco da anterior.
 
 ## A proposta: o domínio declara, a plataforma executa
-
-Um bundle deste repositório tem quatro coisas. Nenhum notebook, nenhum `databricks.yml`, nenhum script de deploy.
 
 ```
 features/
@@ -95,6 +88,24 @@ O caminho que o diagrama descreve, com o que cada trecho resolve.
 
 **Monitoramento.** O Lakehouse Monitoring compara a safra corrente contra a janela em que o modelo foi treinado. A pergunta não é "mudou desde o mês passado", é "afastou-se do que o modelo aprendeu". Quando afasta além do limiar, dispara um retreino no GitHub. O candidato fica registrado e não promovido: alguém precisa aprovar.
 
+### O padrão por trás dessa escolha
+
+Nenhuma dessas decisões é original. Toda empresa que colocou ML em escala esbarrou no mesmo gargalo e construiu alguma camada para resolvê-lo.
+
+| plataforma | abordagem | o que o domínio escreve |
+|---|---|---|
+| Michelangelo (Uber) | plataforma proprietária completa, com UI própria | configuração na plataforma |
+| Metaflow (Netflix) | biblioteca de fluxo em Python, infraestrutura plugável | o fluxo inteiro, como código |
+| Bighead (Airbnb) | conjunto de serviços integrados | integração com cada serviço |
+| Databricks nativo | Feature Engineering, MLflow, Lakehouse Monitoring, DABs | a cola entre eles |
+| este ecossistema | framework único sobre o nativo | só o que é específico do domínio |
+
+A Uber construiu o Michelangelo depois de constatar que cada time reimplementava a mesma infraestrutura e poucos modelos chegavam em produção. A Netflix atacou o mesmo problema pelo lado oposto, com uma biblioteca que o cientista importa em vez de uma plataforma fechada. O Airbnb integrou ferramentas que já existiam. As três soluções custaram anos de engenharia dedicada só para ter uma base.
+
+Hoje essa base vem pronta. O Databricks entrega feature store com resolução no tempo, registro com linhagem, serving nos dois modos e monitoramento. Reconstruir isso seria desperdício. O que faltava é a camada de cima, que define como o domínio declara o que quer, e é exatamente aí que as implementações divergem quando cada time resolve sozinho.
+
+É essa camada que o framework ocupa, e a última coluna da tabela é o motivo: quanto menos o domínio escreve, menos existe para divergir entre dois modelos do mesmo banco.
+
 ## O que muda no ciclo de vida
 
 Os números abaixo saíram da execução real deste repositório, não de estimativa.
@@ -120,23 +131,7 @@ Os números abaixo saíram da execução real deste repositório, não de estima
 
 **Retreino com aprovação evita trocar um problema por outro.** Drift diz que o mundo mudou, não que o modelo novo é melhor. Ele pode ter treinado sobre o mesmo dado deslocado e aprendido o deslocamento. Por isso o candidato fica registrado sem servir ninguém até alguém comparar as duas runs e decidir.
 
-Para uma carteira de varejo, encurtar a defasagem entre deterioração e reação significa cobrar antes, renegociar antes e provisionar com estimativa em vez de com o retrovisor.
-
-## O padrão que adotamos
-
-Um framework único, consumido como pacote, com contrato declarativo por componente. O domínio importa `mlplatform`, declara suas configs e não conhece Spark, DABs nem MLflow.
-
-Como outras empresas resolveram o mesmo problema:
-
-| plataforma | abordagem | o que o domínio escreve |
-|---|---|---|
-| Michelangelo (Uber) | plataforma proprietária completa, com UI própria | configuração na plataforma |
-| Metaflow (Netflix) | biblioteca de fluxo em Python, infraestrutura plugável | o fluxo inteiro, como código |
-| Bighead (Airbnb) | conjunto de serviços integrados | integração com cada serviço |
-| Databricks nativo | Feature Engineering, MLflow, Lakehouse Monitoring, DABs | a cola entre eles |
-| este ecossistema | framework único sobre o nativo | só o que é específico do domínio |
-
-A diferença está na última coluna. Metaflow dá liberdade e pede que cada time escreva o fluxo; Michelangelo padroniza e pede que o time se mova dentro da plataforma. Aqui o nativo do Databricks faz o trabalho pesado, e o framework existe para que o domínio não precise escrever a cola entre as peças, que é justamente onde as implementações divergiam.
+No fim, o ganho é tempo. Quanto antes o banco identifica que um cliente vai ter dificuldade de pagar, mais cedo ele pode oferecer uma renegociação que caiba no bolso da pessoa. Quando essa informação só aparece depois que a dívida já venceu, sobra ao banco absorver a perda e ao cliente sair com o nome sujo.
 
 ## Estrutura
 
@@ -151,13 +146,3 @@ monitoring/      drift de features e de score
 ```
 
 A CI valida os cinco em toda abertura de PR: testes, lint, versão e sintaxe do bundle. O merge na `main` deploya.
-
-## Rodando localmente
-
-```bash
-cd features   # ou training, serving/batch, serving/online, monitoring
-python -m venv .venv && .venv/Scripts/pip install -e ".[dev]"
-.venv/Scripts/python -m pytest
-```
-
-O framework vem pinado por URL de release no `pyproject.toml` de cada bundle, o que permite subir um componente sem arrastar os outros.
