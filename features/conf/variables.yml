@@ -5,6 +5,6 @@
 # do framework vem do pacote instalado. O databricks.yml e o resources/ são
 # materializados pela esteira e não são versionados.
 component: features
-domain_package: exemplo_features
+domain_package: credito_features
 catalog: workspace
 database_instance_name: exemplo-lakebase

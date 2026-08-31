@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "exemplo-features"
+name = "credito-features"
 version = "0.4.0"
 requires-python = ">=3.11"
 # Pinado pela URL do WHEEL do Release, e não por git+https.
@@ -13,14 +13,14 @@ requires-python = ">=3.11"
 # falha no serverless com "Unable to find or download the required package".
 # A URL do Release é um único GET HTTPS — verificado ao vivo que funciona.
 dependencies = [
-    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.10.0/mlplatform-3.10.0-py3-none-any.whl",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.11.0/mlplatform-3.11.0-py3-none-any.whl",
 ]
 
 # Como o framework descobre este domínio: importar o módulo é o que dispara os
 # decorators @feature_table. Antes era um import escrito à mão dentro do
 # notebook; com python_wheel_task não há notebook onde escrevê-lo.
 [project.entry-points."mlplatform.domains"]
-exemplo_features = "exemplo_features.configs"
+credito_features = "credito_features.configs"
 
 # Dependências de teste do domínio. Ficam aqui, e não num requirements-dev.txt
 # solto, para que o pacote declare tudo o que precisa num arquivo só.

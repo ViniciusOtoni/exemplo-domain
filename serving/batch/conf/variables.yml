@@ -1,3 +1,3 @@
 component: serving
-domain_package: exemplo_serving_batch
+domain_package: credito_serving_batch
 catalog: workspace

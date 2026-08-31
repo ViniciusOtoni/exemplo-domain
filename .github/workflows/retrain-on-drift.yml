@@ -15,14 +15,14 @@ on:
       model_name:
         description: Modelo a retreinar.
         required: true
-        default: propensao_exemplo
+        default: pd_inadimplencia
 
 jobs:
   retrain:
     uses: ViniciusOtoni/mlops-platform/.github/workflows/retrain-on-drift.yml@main
     with:
       working-directory: training
-      domain: exemplo
+      domain: credito
       # `github.event.inputs`, e NÃO `inputs`: o contexto `inputs` só existe em
       # workflow_dispatch e workflow_call. Num repository_dispatch ele não é
       # definido, e a referência derruba o workflow no parse — startup_failure,

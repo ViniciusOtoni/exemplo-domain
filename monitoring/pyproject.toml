@@ -3,17 +3,17 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "exemplo-monitoring"
+name = "credito-monitoring"
 version = "0.4.0"
 requires-python = ">=3.11"
 # Pinado pela URL do WHEEL do Release, não por git+https: o wheel do domínio é
 # instalado dentro do serverless, e satisfazer um git+ lá exigiria git e um clone.
 dependencies = [
-    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.10.0/mlplatform-3.10.0-py3-none-any.whl",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.11.0/mlplatform-3.11.0-py3-none-any.whl",
 ]
 
 [project.entry-points."mlplatform.domains"]
-exemplo_monitoring = "exemplo_monitoring.configs"
+credito_monitoring = "credito_monitoring.configs"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

@@ -1,4 +1,4 @@
-domain: exemplo
+domain: credito
 owner: vinicius-otoni
 
 # O framework é um pacote só. Antes havia uma versão por componente, porque eram
@@ -9,10 +9,10 @@ owner: vinicius-otoni
 # ainda não migrados seguem nas tags antigas por componente até sua vez.
 framework:
   package: mlplatform
-  version: v3.5.1
+  version: v3.11.0
 
 components:
   features: migrated
   training: migrated
   serving: migrated
-  monitoring: pending
+  monitoring: migrated
