@@ -3,17 +3,17 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "exemplo-serving-batch"
+name = "credito-serving-batch"
 version = "0.6.0"
 requires-python = ">=3.11"
 # Pinado pela URL do WHEEL do Release, não por git+https: o wheel do domínio é
 # instalado dentro do serverless, e satisfazer um git+ lá exigiria git e um clone.
 dependencies = [
-    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.10.0/mlplatform-3.10.0-py3-none-any.whl",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.11.1/mlplatform-3.11.1-py3-none-any.whl",
 ]
 
 [project.entry-points."mlplatform.domains"]
-exemplo_serving_batch = "exemplo_serving_batch.configs"
+credito_serving_batch = "credito_serving_batch.configs"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

@@ -1,5 +1,5 @@
 component: monitoring
-domain_package: exemplo_monitoring
+domain_package: credito_monitoring
 catalog: workspace
 
 # Repositório avisado por repository_dispatch quando o drift passa do limiar.

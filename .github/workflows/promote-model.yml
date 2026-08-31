@@ -16,7 +16,7 @@ on:
       model_name:
         description: Modelo a promover.
         required: true
-        default: propensao_exemplo
+        default: pd_inadimplencia
       version:
         description: Versão candidata (está na issue aberta pelo retreino).
         required: true
@@ -30,7 +30,7 @@ jobs:
     uses: ViniciusOtoni/mlops-platform/.github/workflows/promote-model.yml@main
     with:
       working-directory: training
-      domain: exemplo
+      domain: credito
       model-name: ${{ inputs.model_name }}
       version: ${{ inputs.version }}
       alias: ${{ inputs.alias }}
