@@ -1,0 +1,32 @@
+# Retreino disparado pelo job de drift no Databricks.
+#
+# O `EvaluateDrift` faz um POST em /repos/<repo>/dispatches quando alguma coluna
+# passa do limiar. O payload carrega qual modelo e quais colunas driftaram.
+#
+# `workflow_dispatch` fica disponível também: às vezes se quer retreinar sem
+# esperar o drift — depois de corrigir uma feature, por exemplo.
+name: Retrain on Drift
+
+on:
+  repository_dispatch:
+    types: [mlplatform-drift]
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: Modelo a retreinar.
+        required: true
+        default: propensao_exemplo
+
+jobs:
+  retrain:
+    uses: ViniciusOtoni/mlops-platform/.github/workflows/retrain-on-drift.yml@main
+    with:
+      working-directory: training
+      domain: exemplo
+      # O nome vem do payload quando é drift, e do input quando é manual.
+      model-name: >-
+        ${{ github.event.client_payload.model_name || inputs.model_name }}
+      catalog: workspace
+      alias: champion
+      promotion-environment: model-promotion
+    secrets: inherit

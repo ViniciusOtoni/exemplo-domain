@@ -48,3 +48,26 @@ def test_features_are_checked_before_predictions():
 
     assert features.schedule_cron == "0 0 7 * * ?"
     assert predictions.schedule_cron == "0 0 8 * * ?"
+
+
+def test_the_metric_applies_to_the_column_types_being_watched():
+    """As colunas observadas são numéricas. As métricas limitadas a [0,1] —
+    js_distance, tv_distance, l_infinity_distance — só são calculadas para
+    colunas CATEGÓRICAS: escolher uma delas aqui produziria nulo em toda
+    medição, que é "sem drift" para sempre."""
+    from mlplatform.monitoring.metrics import resolve
+
+    features = get_monitoring_config("exemplo", "propensao_exemplo", "feature_table")
+
+    assert not resolve(features.drift_metric).bounded, "métrica limitada a [0,1] não serve para numérica"
+    assert features.drift_metric == "population_stability_index"
+
+
+def test_the_threshold_follows_the_psi_convention():
+    """PSI não tem teto, então o limiar não vem da escala: vem da convenção
+    estabelecida (>0.25 significativo)."""
+    features = get_monitoring_config("exemplo", "propensao_exemplo", "feature_table")
+    predictions = get_monitoring_config("exemplo", "propensao_exemplo", "predictions")
+
+    assert features.threshold == 0.25
+    assert predictions.threshold == 0.25

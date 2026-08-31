@@ -1,3 +1,11 @@
 component: monitoring
 domain_package: exemplo_monitoring
 catalog: workspace
+
+# Repositório avisado por repository_dispatch quando o drift passa do limiar.
+# O workflow retrain-on-drift.yml deste repo recebe o evento, retreina sem
+# promover, e a promoção espera aprovação no Environment `model-promotion`.
+#
+# O token vai por variável de ambiente GITHUB_TOKEN na task, não por parâmetro
+# de job: parâmetro fica visível no histórico de execuções.
+retrain_repository: ViniciusOtoni/exemplo-domain
