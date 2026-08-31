@@ -23,9 +23,12 @@ jobs:
     with:
       working-directory: training
       domain: exemplo
-      # O nome vem do payload quando é drift, e do input quando é manual.
+      # `github.event.inputs`, e NÃO `inputs`: o contexto `inputs` só existe em
+      # workflow_dispatch e workflow_call. Num repository_dispatch ele não é
+      # definido, e a referência derruba o workflow no parse — startup_failure,
+      # sem job nenhum e sem mensagem na UI.
       model-name: >-
-        ${{ github.event.client_payload.model_name || inputs.model_name }}
+        ${{ github.event.client_payload.model_name || github.event.inputs.model_name }}
       catalog: workspace
       alias: champion
     secrets: inherit
