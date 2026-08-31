@@ -121,16 +121,6 @@ Os números abaixo saíram da execução real deste repositório, não de estima
 | detectar drift | ninguém detecta | monitor por safra, com veredito gravado |
 | retreinar | manual | disparado por drift, com aprovação humana antes de promover |
 
-## O que isso vale no crédito
-
-**Ponto no tempo evita métrica inflada.** Um modelo que enxerga o futuro entrega AUC alto e falha em produção. O nosso deu 0,7631 no teste, que é a faixa de um modelo de PD honesto. Um número muito acima disso seria sintoma de vazamento, não de qualidade.
-
-**Split temporal mede a perda real.** Da validação (0,7862) para o teste (0,7631) o modelo cai 2,3 pontos. Essa queda é a deterioração da carteira aparecendo na medida. Um split aleatório teria escondido isso e prometido uma performance que não se sustenta.
-
-**Drift com baseline na janela de treino aponta o que mudou.** No ciclo atual, o atraso comportamental foi a variável mais deslocada. Faz sentido de negócio: é a mais próxima do desfecho. Quando ela se move, a inadimplência já está a caminho.
-
-**Retreino com aprovação evita trocar um problema por outro.** Drift diz que o mundo mudou, não que o modelo novo é melhor. Ele pode ter treinado sobre o mesmo dado deslocado e aprendido o deslocamento. Por isso o candidato fica registrado sem servir ninguém até alguém comparar as duas runs e decidir.
-
 No fim, o ganho é tempo. Quanto antes o banco identifica que um cliente vai ter dificuldade de pagar, mais cedo ele pode oferecer uma renegociação que caiba no bolso da pessoa. Quando essa informação só aparece depois que a dívida já venceu, sobra ao banco absorver a perda e ao cliente sair com o nome sujo.
 
 ## Estrutura
