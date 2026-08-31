@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exemplo-features"
-version = "0.3.0"
+version = "0.3.1"
 requires-python = ">=3.11"
 # Pinado pela URL do WHEEL do Release, e não por git+https.
 #
@@ -13,7 +13,7 @@ requires-python = ">=3.11"
 # falha no serverless com "Unable to find or download the required package".
 # A URL do Release é um único GET HTTPS — verificado ao vivo que funciona.
 dependencies = [
-    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.9.0/mlplatform-3.9.0-py3-none-any.whl",
+    "mlplatform @ https://github.com/ViniciusOtoni/platform-libs/releases/download/mlplatform-v3.9.1/mlplatform-3.9.1-py3-none-any.whl",
 ]
 
 # Como o framework descobre este domínio: importar o módulo é o que dispara os
