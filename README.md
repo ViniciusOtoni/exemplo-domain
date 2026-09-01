@@ -1,6 +1,6 @@
 # Risco de crédito sobre uma plataforma de ML
 
-**Atenção**: esse repositório tem o intuito de realizar um comparativo entre um ecossistema sem padrões de MLOps e outro onde temos uma plataforma mais madura e preparada, e quais são os efeitos e ganhos disso. Não vamos nos aprofundar em conceitos de Ciência de Dados como estatística etc. Peguei esse problema de qualidade de crédito apenas por ser algo recente e estar atrelado à empresa na qual eu trabalho.
+**Atenção**: este repositório tem o intuito de realizar um comparativo entre um ecossistema sem padrões de MLOps e outro onde temos uma plataforma mais madura e preparada, e quais são os efeitos e ganhos disso. Não vamos nos aprofundar em conceitos de Ciência de Dados como estatística etc. Peguei este problema de qualidade de crédito apenas por ser algo recente e estar atrelado à empresa na qual eu trabalho.
 
 ![Endividamento das famílias no Brasil](docs/img/endividamento-familias.png)
 
@@ -53,7 +53,7 @@ Nada disso é difícil isoladamente. O custo está em fazer tudo de novo a cada 
 
 O objetivo é simples: dar o "caminho das pedras" para que o cientista, de forma autônoma, consiga criar as suas features e publicá-las em nossa Feature Store — fomentando o reúso e tendo mais confiabilidade nos dados —, treinar o seu modelo de forma simples e com boas práticas/padrões estabelecidos pelo mercado, servir o seu modelo e, por fim, ter a visibilidade da necessidade de retreino do modelo conforme as novas safras.
 
-O ganho aqui é deixar a experiência do cientista mais dinâmica (logo, ele consegue produtizar os seus modelos e chegar na etapa final sem muitos problemas), aplicar padrões e confiabilidade em toda a jornada e, por fim, também economizar custos em todo o processo para a instituição, evitando a redundância entre os processos.
+O ganho aqui é deixar a experiência do cientista mais dinâmica (logo, ele consegue produtizar os seus modelos e chegar à etapa final sem muitos problemas), aplicar padrões e confiabilidade em toda a jornada e, por fim, também economizar custos em todo o processo para a instituição, evitando a redundância entre os processos.
 
 ### Exemplo para as Feature Tables
 
@@ -94,17 +94,48 @@ Todo o enxoval será abstraído para o cientista: ele vai apenas criar a sua Fea
 
 ![Arquitetura do ecossistema](docs/img/arquitetura.png)
 
-**Feature store.** As feature tables são criadas `point-in-time` e utilizando também o recurso de `feature-lookup`. Dessa forma, existe um vínculo intrínseco das features com o modelo.
+**Feature store.** As feature tables são criadas `point-in-time` e utilizam também o recurso de `synced table`. Dessa forma, temos uma réplica da nossa feature no ambiente transacional, no `Lakebase`, possibilitando o consumo de baixa latência para o cenário de inferência online.
 
-**Treino.** O split entre os 3 datasets é feito de forma temporal: treinamos o modelo com dados do passado, geramos `child runs` para comparar qual é o modelo com melhor desempenho e declaramos o `champion`. Por fim, testamos o modelo com "dados do futuro", nos quais o modelo não tinha visibilidade durante a etapa de treinamento, e validamos a sua sanidade.
+**Linhagem**
 
-**Serving.** Temos dois processos de inferência. O **online**, onde servimos um endpoint para consumo do modelo que consome `Synced Tables` (também conhecidas como Online Tables) para recuperar os dados frescos das Feature Tables. E também o processo **batch**, onde geramos um workflow e consumimos as features do nosso catálogo de dados.
+![lineage-feature](docs/img/lineage-feature.png)
 
-**Monitoramento.** O Lakehouse Monitoring compara a safra corrente contra a janela em que o modelo foi treinado. A pergunta não é "mudou desde o mês passado", é "afastou-se do que o modelo aprendeu". Quando afasta além do limiar, dispara um retreino no GitHub. O candidato fica registrado e não promovido: alguém precisa aprovar.
+**Synced Table (Tabela no Lakebase)**
 
-### O padrão por trás dessa escolha
+![lakabase-table](docs/img/lakabase.png)
 
-Eu não reinventei a roda. Isso já é um padrão que alguns players de mercado adotam. Seguem exemplos:
+**Treino.** O split entre os 3 datasets é feito de forma temporal: treinamos o modelo com dados do passado, geramos `child runs` para comparar qual é o modelo com melhor desempenho e declaramos o `champion`. Por fim, testamos o modelo com "dados do futuro", sobre os quais o modelo não tinha visibilidade durante a etapa de treinamento, e validamos a sua sanidade.
+
+Aqui conseguimos visualizar os hiperparâmetros utilizados em cada `child run` e quais prevaleceram após as comparações baseadas na métrica preenchida pelo cientista, promovendo assim o modelo **champion**.
+
+![runs-mlflow](docs/img/runs-mlflow.png)
+
+Na etapa de treino, também utilizamos o `feature-lookup` para atrelar as features ao nosso modelo. Dessa forma, o modelo carrega consigo, de forma intrínseca, as features que foram utilizadas, permitindo um tracking mais fácil e outros benefícios técnicos que serão abordados posteriormente.
+
+![lineage-model](docs/img/lineage-model.png)
+
+**Serving.** Temos dois processos de inferência. O **online**, em que servimos um endpoint de consumo do modelo, que utiliza `Synced Tables` (também conhecidas como Online Tables) para recuperar os dados frescos das Feature Tables.
+
+![score-online](docs/img/score-online.png)
+
+Note que, em nosso request, não foi necessário passar as features para realizar a inferência. Isso é graças ao `feature-lookup` que mencionamos na etapa de treino.
+
+Temos também o processo **batch**, em que geramos um workflow e consumimos as features do nosso catálogo de dados.
+
+![score-batch](docs/img/score-batch.png)
+
+Aqui também temos outro ganho do `feature-lookup`. É muito comum, em um processo batch, ter uma task para geração da tabela **master**, constituída pelo join entre as feature tables e a tabela spine. Por conta do `feature-lookup`, não precisamos dessa task. Assim, aumentamos a eficiência do processo (tanto em performance quanto em custos) e também a qualidade da inferência, já que temos a certeza de que estamos consumindo as mesmas features utilizadas durante a etapa de treino.
+
+
+**Monitoramento.** O Lakehouse Monitoring compara a safra atual contra a safra em que o modelo foi treinado. Dessa forma, conseguimos ver com clareza se houve `drift` nos dados e disparar o retreino do modelo.
+
+**trecho do dashboard gerado para acompanhamento**
+
+![dashboard-drift](docs/img/dashboard-drift.png)
+
+### Como outros players reagiram
+
+Eu não reinventei a roda. Esse problema está presente em várias empresas e já foi solucionado de diferentes formas.
 
 | Plataforma | Abordagem | O que o domínio escreve |
 | --- | --- | --- |
@@ -112,18 +143,22 @@ Eu não reinventei a roda. Isso já é um padrão que alguns players de mercado 
 | Metaflow (Netflix) | biblioteca de fluxo em Python, infraestrutura plugável | o fluxo inteiro, como código |
 | Bighead (Airbnb) | conjunto de serviços integrados | integração com cada serviço |
 
-Todas essas empresas identificaram o mesmo problema: redundância de infraestrutura, demora para produtização de seus modelos e poucos ganhos. A decisão foi estruturar a plataforma conforme a necessidade.
+Todas essas empresas identificaram o mesmo problema: redundância de infraestrutura, demora na produtização de seus modelos e poucos ganhos. A decisão foi estruturar a plataforma conforme a necessidade.
 
-### Qual foi o caminho da *minha* solução
+### Qual foi o caminho da minha solução
 
 Hoje meu ecossistema está totalmente atrelado ao Databricks. Talvez com um certo viés pelo fato de a empresa em que eu trabalho utilizar a ferramenta, mas é fato que, com ela, conseguimos centralizar todas as soluções pertinentes a esse problema.
 
 Conseguimos estruturar a nossa Feature Store e ainda aplicar governança de dados nas tabelas; também conseguimos utilizar o `Lakebase` para transacionar as Feature Tables com baixa latência para o cenário da inferência online, além de conseguir promover o reúso do nosso componente sobre toda a plataforma.
 
-## O que muda no ciclo de vida
+## O que muda no fim
 
-Agora o cientista, idealmente, não gastaria mais tanto tempo se questionando sobre como servir o modelo dele e gerar impacto para a instituição, mas sim focaria apenas no que tange à sua jornada. O resto, a plataforma irá abstrair.
+Fazendo uma alusão aos questionamentos levantados no começo, como o Itaú conseguiu segurar o aumento da inadimplência? Não posso assumir qual é a metodologia adotada por eles, mas tudo indica que eles possuem uma plataforma governada, confiável e curta para o contexto de ML (pensando no melhor dos cenários).
 
-E para a instituição? Qual é o ganho em ter essa plataforma?
+Esse é o ganho que eu gostaria de tangibilizar neste projeto. Agora, o ganho de forma mais granular por persona:
 
-No fim, o ganho é tempo e impacto na qualidade de seu crédito. Quanto antes o modelo estiver sendo consumido de forma confiável e governada, mais cedo o banco poderá sugerir uma renegociação para o cliente ou até mesmo evitar de emprestar crédito para possíveis clientes inadimplentes, gerando um impacto real em sua receita líquida.
+**Para o cientista:** O cientista fica focado apenas no que tange à sua matéria e jornada. O processo se torna mais simples e exige apenas algumas variáveis de configuração para o objetivo final (modelo ser consumido em produção) acontecer.
+
+**Para o time de plataforma:** Maior visibilidade e `tracking` de todo o ciclo de vida. Agora todos os componentes estão padronizados e estruturados para maior eficiência de todo o ecossistema, além de fomentar o reúso entre os próprios domínios de dados.
+
+**Para a instituição:** A eficiência. O modelo chega ao ambiente produtivo de forma muito mais dinâmica e, consequentemente, os resultados do consumo desse modelo já começam a ser colhidos. Além disso, há a eficiência presente em todo o nosso ecossistema, que traz todos os ganhos que eu mencionei.
