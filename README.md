@@ -1,52 +1,68 @@
 # Risco de crédito sobre uma plataforma de ML
 
-Um modelo que estima probabilidade de inadimplência, e o ecossistema que faz esse modelo chegar em produção sem virar projeto de seis meses.
+**Atenção**: esse repositório tem o intuito de realizar um comparativo entre um ecossistema sem padrões de MLOps e outro onde temos uma plataforma mais madura e preparada, e quais são os efeitos e ganhos disso. Não vamos nos aprofundar em conceitos de Ciência de Dados como estatística etc. Peguei esse problema de qualidade de crédito apenas por ser algo recente e estar atrelado à empresa na qual eu trabalho.
 
 ![Endividamento das famílias no Brasil](docs/img/endividamento-familias.png)
 
-Oito em cada dez famílias brasileiras estão endividadas. Em 2015 eram seis.
+**Oito** em cada dez famílias brasileiras estão endividadas. Em 2015 eram **seis**.
 
-## O primeiro problema: o crédito piorou, e não foi por desemprego
+## Problema da qualidade de crédito no setor bancário
 
-O mercado de trabalho seguiu aquecido. O que apertou foi o preço da dívida.
-
-| indicador | valor | variação em 12 meses |
-|---|---|---|
-| comprometimento de renda | 29,7% | +1,9 p.p. |
-| endividamento sobre renda | 49,9% | +1,3 p.p. |
-| inadimplência das famílias | 5,3% | +1,4 p.p. |
-| juros do rotativo | 451,5% ao ano | |
+| Indicador | Valor | Variação em 12 meses |
+| --- | --- | --- |
+| Comprometimento de renda | 29,7% | +1,9 p.p. |
+| Endividamento sobre renda | 49,9% | +1,3 p.p. |
+| Inadimplência das famílias | 5,3% | +1,4 p.p. |
+| Juros do rotativo | 451,5% ao ano | — |
 
 Dados do Banco Central, referência fevereiro e março de 2026, via [Agência Brasil](https://agenciabrasil.ebc.com.br/economia/noticia/2026-04/juros-elevados-mantem-pressao-sobre-endividamento-das-familias).
 
-Nos balanços do segundo trimestre, um banco se descolou dos outros.
+Dessa forma, podemos ter a visibilidade de que boa parte da renda da família média brasileira já está comprometida antes mesmo de cair na conta e que, se levarmos em consideração a atual taxa de juros do Brasil, a *Taxa Selic*, a probabilidade de não cumprimento do crédito pode ser grande. Não vou entrar no mérito dos motivos desse maior endividamento, mas é fato que isso é um grande alerta para todo o setor bancário, levando em consideração que um dos braços mais relevantes é a sua qualidade de crédito.
+
+No primeiro semestre, o banco Itaú conseguiu estabilizar o aumento da inadimplência, e podemos levantar uma série de questionamentos:
+
+* Será que os clientes do banco Itaú são melhores? (Acredito que não exista uma diferença grande aqui comparando com os outros players.)
+* Será que o Itaú tem um LLM extremamente capacitado para diagnosticar esses calotes?
+* Como o Itaú está conseguindo manter essa qualidade?
+---
 
 ![Inadimplência acima de 90 dias por banco, 2T26](docs/img/npl-bancos-2t26.png)
 
-## O segundo problema: o modelo existe, mas não chega
+E se eu te contar que um modelo de Machine Learning tradicional já é suficiente para realizar ótimas predições? Novamente, não vamos entrar em conceitos estatísticos aqui para definir qual é o melhor algoritmo para esse cenário, as melhores features, os hiperparâmetros etc. Mas sim: como podemos potencializar esse delivery para afetar o cliente final da forma mais rápida e eficaz?
 
-O cientista de dados dá conta da parte difícil. Ele entende a regra de negócio, conversa com a área de crédito, escolhe as variáveis que fazem sentido e treina um modelo que funciona.
+## O problema de não ter uma plataforma consolidada para ML
 
-O problema começa depois. Sem uma plataforma madura por baixo, esse modelo pode levar meses até servir alguém, e às vezes não chega. Cada etapa vira um projeto próprio:
+O cientista até consegue definir qual será o algoritmo que melhor se encaixa para o problema, quais serão os hiperparâmetros utilizados e a normalização. Porém, ele já começa a se deparar com alguns problemas:
 
-| etapa | o que normalmente acontece |
-|---|---|
-| feature store | a mesma feature é recalculada em vários lugares, e os valores não batem entre si |
-| treino | cada pessoa treina do seu jeito, sem um padrão de MLOps que valha para todo mundo |
-| registro | modelo salvo sem linhagem, ninguém sabe quais features entraram |
-| serving | sem uma feature store madura por trás, batch e online são construídos separados e passam a divergir |
-| monitoramento e retreino | ninguém enxerga o drift de forma tangível, e cada safra nova levanta a dúvida de retreinar sem resposta objetiva |
+* Quais são as features? Ele não tem uma Feature Store madura o suficiente para evidenciar quais são as Feature Tables que ele deveria consumir.
+* Como posso treinar o meu modelo e ter a confiança de que não vou ter problemas durante a etapa de treinamento, como Data Leakage, por exemplo?
+* Como faço para promover o meu modelo? Quais são os caminhos para servir esse meu modelo?
+* Como sei que meu modelo está performando bem após ser implementado?
+
+| Etapa | O que normalmente acontece |
+| --- | --- |
+| Feature store | a mesma feature é recalculada em vários lugares, e os valores não batem entre si |
+| Treino | cada pessoa treina do seu jeito, sem um padrão de MLOps que valha para todo mundo |
+| Registro | modelo salvo sem linhagem, ninguém sabe quais features entraram |
+| Serving | sem uma feature store madura por trás, batch e online são construídos separados e passam a divergir |
+| Monitoramento e retreino | ninguém enxerga o drift de forma tangível, e cada safra nova levanta a dúvida de retreinar sem resposta objetiva |
 
 Nada disso é difícil isoladamente. O custo está em fazer tudo de novo a cada modelo, e em cada reimplementação divergir um pouco da anterior.
 
-## A proposta: o domínio declara, a plataforma executa
+## Como a plataforma resolve esses problemas
 
-```
+O objetivo é simples: dar o "caminho das pedras" para que o cientista, de forma autônoma, consiga criar as suas features e publicá-las em nossa Feature Store — fomentando o reúso e tendo mais confiabilidade nos dados —, treinar o seu modelo de forma simples e com boas práticas/padrões estabelecidos pelo mercado, servir o seu modelo e, por fim, ter a visibilidade da necessidade de retreino do modelo conforme as novas safras.
+
+O ganho aqui é deixar a experiência do cientista mais dinâmica (logo, ele consegue produtizar os seus modelos e chegar na etapa final sem muitos problemas), aplicar padrões e confiabilidade em toda a jornada e, por fim, também economizar custos em todo o processo para a instituição, evitando a redundância entre os processos.
+
+### Exemplo para as Feature Tables
+
+```text
 features/
-├── conf/variables.yml        # 3 linhas
-├── pyproject.toml            # dependência e entry point
+├── conf/variables.yml
+├── pyproject.toml
 ├── src/credito_features/
-│   └── configs.py            # o que é específico do domínio
+│   └── configs.py            # Features do domínio
 └── tests/
 ```
 
@@ -72,77 +88,42 @@ def perfil_credito_cliente(sources, window):
     ...
 ```
 
-O resto (bundle DAB, job, schedule, permissões, tabela particionada, chave primária, sincronização com o Lakebase) é gerado pela esteira.
+Todo o enxoval será abstraído para o cientista: ele vai apenas criar a sua Feature Table em nossa Feature Store e consumir.
 
 ## Como o ecossistema foi montado
 
 ![Arquitetura do ecossistema](docs/img/arquitetura.png)
 
-O caminho que o diagrama descreve, com o que cada trecho resolve.
+**Feature store.** As feature tables são criadas `point-in-time` e utilizando também o recurso de `feature-lookup`. Dessa forma, existe um vínculo intrínseco das features com o modelo.
 
-**Feature store.** As features são gravadas por safra, e o `FeatureLookup` resolve ponto no tempo: ao montar o conjunto de treino da safra de março, ele busca a feature vigente em março, não a de hoje. Sem isso o modelo aprende com dado que não existia quando a decisão foi tomada.
+**Treino.** O split entre os 3 datasets é feito de forma temporal: treinamos o modelo com dados do passado, geramos `child runs` para comparar qual é o modelo com melhor desempenho e declaramos o `champion`. Por fim, testamos o modelo com "dados do futuro", nos quais o modelo não tinha visibilidade durante a etapa de treinamento, e validamos a sua sanidade.
 
-**Treino.** O split é temporal, não aleatório. O modelo treina nas safras antigas e é avaliado nas recentes. Cada combinação de hiperparâmetros vira um run aninhado no MLflow, comparável lado a lado. O vencedor é testado uma vez, passa por um gate de sanidade e só então promove o alias `champion`.
-
-**Serving.** O mesmo modelo, com a mesma linhagem, atende os dois modos. Em lote, lendo a tabela Delta. Em tempo real, lendo o Lakebase. O domínio não escreve código para nenhum dos dois.
+**Serving.** Temos dois processos de inferência. O **online**, onde servimos um endpoint para consumo do modelo que consome `Synced Tables` (também conhecidas como Online Tables) para recuperar os dados frescos das Feature Tables. E também o processo **batch**, onde geramos um workflow e consumimos as features do nosso catálogo de dados.
 
 **Monitoramento.** O Lakehouse Monitoring compara a safra corrente contra a janela em que o modelo foi treinado. A pergunta não é "mudou desde o mês passado", é "afastou-se do que o modelo aprendeu". Quando afasta além do limiar, dispara um retreino no GitHub. O candidato fica registrado e não promovido: alguém precisa aprovar.
 
 ### O padrão por trás dessa escolha
 
-Nenhuma dessas decisões é original. Toda empresa que colocou ML em escala esbarrou no mesmo gargalo e construiu alguma camada para resolvê-lo.
+Eu não reinventei a roda. Isso já é um padrão que alguns players de mercado adotam. Seguem exemplos:
 
-| plataforma | abordagem | o que o domínio escreve |
-|---|---|---|
+| Plataforma | Abordagem | O que o domínio escreve |
+| --- | --- | --- |
 | Michelangelo (Uber) | plataforma proprietária completa, com UI própria | configuração na plataforma |
 | Metaflow (Netflix) | biblioteca de fluxo em Python, infraestrutura plugável | o fluxo inteiro, como código |
 | Bighead (Airbnb) | conjunto de serviços integrados | integração com cada serviço |
-| Databricks nativo | Feature Engineering, MLflow, Lakehouse Monitoring, DABs | a cola entre eles |
-| este ecossistema | framework único sobre o nativo | só o que é específico do domínio |
 
-A Uber construiu o Michelangelo depois de constatar que cada time reimplementava a mesma infraestrutura e poucos modelos chegavam em produção. A Netflix atacou o mesmo problema pelo lado oposto, com uma biblioteca que o cientista importa em vez de uma plataforma fechada. O Airbnb integrou ferramentas que já existiam. As três soluções custaram anos de engenharia dedicada só para ter uma base.
+Todas essas empresas identificaram o mesmo problema: redundância de infraestrutura, demora para produtização de seus modelos e poucos ganhos. A decisão foi estruturar a plataforma conforme a necessidade.
 
-Hoje essa base vem pronta. O Databricks entrega feature store com resolução no tempo, registro com linhagem, serving nos dois modos e monitoramento. Reconstruir isso seria desperdício. O que faltava é a camada de cima, que define como o domínio declara o que quer, e é exatamente aí que as implementações divergem quando cada time resolve sozinho.
+### Qual foi o caminho da *minha* solução
 
-É essa camada que o framework ocupa, e a última coluna da tabela é o motivo: quanto menos o domínio escreve, menos existe para divergir entre dois modelos do mesmo banco.
+Hoje meu ecossistema está totalmente atrelado ao Databricks. Talvez com um certo viés pelo fato de a empresa em que eu trabalho utilizar a ferramenta, mas é fato que, com ela, conseguimos centralizar todas as soluções pertinentes a esse problema.
+
+Conseguimos estruturar a nossa Feature Store e ainda aplicar governança de dados nas tabelas; também conseguimos utilizar o `Lakebase` para transacionar as Feature Tables com baixa latência para o cenário da inferência online, além de conseguir promover o reúso do nosso componente sobre toda a plataforma.
 
 ## O que muda no ciclo de vida
 
-Os números abaixo saíram da execução real deste repositório, não de estimativa.
+Agora o cientista, idealmente, não gastaria mais tanto tempo se questionando sobre como servir o modelo dele e gerar impacto para a instituição, mas sim focaria apenas no que tange à sua jornada. O resto, a plataforma irá abstrair.
 
-| etapa | antes | com a plataforma |
-|---|---|---|
-| declarar uma feature table | notebook + job + tabela criados à mão | uma função decorada |
-| montar conjunto de treino | join manual, risco de vazamento | `FeatureLookup` resolvendo ponto no tempo, 24 safras |
-| comparar hiperparâmetros | células soltas no notebook | runs aninhados no MLflow, métrica por combinação |
-| promover modelo | alguém move o alias | automático após o gate, ou manual quando o gatilho foi drift |
-| servir em lote | script próprio | job gerado, 30 mil clientes pontuados |
-| servir em tempo real | endpoint montado à mão | endpoint gerado, resolvendo features pela linhagem |
-| detectar drift | ninguém detecta | monitor por safra, com veredito gravado |
-| retreinar | manual | disparado por drift, com aprovação humana antes de promover |
+E para a instituição? Qual é o ganho em ter essa plataforma?
 
-## O que isso vale no crédito
-
-**Ponto no tempo evita métrica inflada.** Um modelo que enxerga o futuro entrega AUC alto e falha em produção. O nosso deu 0,7631 no teste, que é a faixa de um modelo de PD honesto. Um número muito acima disso seria sintoma de vazamento, não de qualidade.
-
-**Split temporal mede a perda real.** Da validação (0,7862) para o teste (0,7631) o modelo cai 2,3 pontos. Essa queda é a deterioração da carteira aparecendo na medida. Um split aleatório teria escondido isso e prometido uma performance que não se sustenta.
-
-**Drift com baseline na janela de treino aponta o que mudou.** No ciclo atual, o atraso comportamental foi a variável mais deslocada. Faz sentido de negócio: é a mais próxima do desfecho. Quando ela se move, a inadimplência já está a caminho.
-
-**Retreino com aprovação evita trocar um problema por outro.** Drift diz que o mundo mudou, não que o modelo novo é melhor. Ele pode ter treinado sobre o mesmo dado deslocado e aprendido o deslocamento. Por isso o candidato fica registrado sem servir ninguém até alguém comparar as duas runs e decidir.
-
-No fim, o ganho é tempo. Quanto antes o banco identifica que um cliente vai ter dificuldade de pagar, mais cedo ele pode oferecer uma renegociação que caiba no bolso da pessoa. Quando essa informação só aparece depois que a dívida já venceu, sobra ao banco absorver a perda e ao cliente sair com o nome sujo.
-
-## Estrutura
-
-Cinco bundles, um por componente, todos consumindo a mesma versão do framework.
-
-```
-features/        perfil_credito_cliente, 8 features por safra
-training/        pd_inadimplencia, GradientBoosting, split temporal
-serving/batch/   scoragem mensal da carteira
-serving/online/  endpoint para decisão no momento da solicitação
-monitoring/      drift de features e de score
-```
-
-A CI valida os cinco em toda abertura de PR: testes, lint, versão e sintaxe do bundle. O merge na `main` deploya.
+No fim, o ganho é tempo e impacto na qualidade de seu crédito. Quanto antes o modelo estiver sendo consumido de forma confiável e governada, mais cedo o banco poderá sugerir uma renegociação para o cliente ou até mesmo evitar de emprestar crédito para possíveis clientes inadimplentes, gerando um impacto real em sua receita líquida.
